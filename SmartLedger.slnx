@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartLedger.API/SmartLedger.API.csproj" />
+    <Project Path="src/SmartLedger.Application/SmartLedger.Application.csproj" />
+    <Project Path="src/SmartLedger.Domain/SmartLedger.Domain.csproj" />
+    <Project Path="src/SmartLedger.Infrastructure/SmartLedger.Infrastructure.csproj" />
+    <Project Path="src/SmartLedger.Worker/SmartLedger.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartLedger.IntegrationTests/SmartLedger.IntegrationTests.csproj" />
+    <Project Path="tests/SmartLedger.UnitTests/SmartLedger.UnitTests.csproj" />
+  </Folder>
+</Solution>
