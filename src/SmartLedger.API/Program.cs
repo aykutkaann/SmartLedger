@@ -6,7 +6,11 @@ using Microsoft.OpenApi.Models;
 using Npgsql;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-
+using SmartLedger.API.Endpoints;
+using SmartLedger.API.Middleware;
+using SmartLedger.Application.Accounts;
+using SmartLedger.Application.Auth;
+using SmartLedger.Application.Transfers;
 using SmartLedger.Domain.Interfaces;
 using SmartLedger.Domain.Services;
 using SmartLedger.Infrastructure.Persistence;
@@ -25,7 +29,11 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connStr));
 
 // ── CQRS ──────────────────────────────────────────────────────────────────────
-
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblies(
+        typeof(RegisterCommand).Assembly,
+        typeof(CreateAccountCommand).Assembly,
+        typeof(InitiateTransferCommand).Assembly));
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -56,7 +64,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // ── OpenTelemetry ─────────────────────────────────────────────────────────────
-
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r.AddService("SmartLedger.API"))
+    .WithTracing(t => t
+        .AddAspNetCoreInstrumentation()
+        .AddConsoleExporter()); 
 
 // ── Swagger ───────────────────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
@@ -100,7 +112,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("ReactDev");
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<RlsMiddleware>(); // sets app.current_user_id for RLS
 
 // ── Auto-migrate on startup (dev only) ───────────────────────────────────────
 if (app.Environment.IsDevelopment())
@@ -111,7 +124,9 @@ if (app.Environment.IsDevelopment())
 }
 
 // ── Endpoint registration ─────────────────────────────────────────────────────
-
+app.MapAuthEndpoints();
+app.MapAccountEndpoints();
+app.MapTransferEndpoints();
 
 app.Run();
 

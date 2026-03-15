@@ -43,12 +43,25 @@ namespace SmartLedger.Domain.Entities
 
         public void Debit(decimal amount)
         {
-            if(Status != AccountStatus.Active)
+            if (Status != AccountStatus.Active)
                 throw new DomainException($"Cannot debit a {Status} account.");
             if (amount <= 0)
-                throw new DomainException("Credit Amount Must Be Positive");
+                throw new DomainException("Debit amount must be positive.");
+            if (Balance < amount)
+                throw new DomainException("Insufficient funds.");
 
-            Balance += amount;
+            Balance -= amount;  
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void Credit(decimal amount)
+        {
+            if (Status != AccountStatus.Active)
+                throw new DomainException($"Cannot credit a {Status} account.");
+            if (amount <= 0)
+                throw new DomainException("Credit amount must be positive.");
+
+            Balance += amount;  
             UpdatedAt = DateTime.UtcNow;
         }
 
@@ -61,7 +74,7 @@ namespace SmartLedger.Domain.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
-        public void Closed()
+        public void Close()
         {
             if (Balance != 0)
                 throw new DomainException("Cannot close an account with a non-zero balance");
