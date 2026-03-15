@@ -18,7 +18,6 @@ Demonstrates row-level security, serializable transactions, JSONB fraud signals,
 | Observability  | OpenTelemetry → Jaeger                          |
 | Frontend       | React 18 + TypeScript + Vite                    |
 | Tests          | xUnit + Testcontainers (real Postgres)          |
-| CI/CD          | GitHub Actions                                  |
 | Containers     | Docker + Docker Compose                         |
 
 ---
@@ -30,18 +29,17 @@ Demonstrates row-level security, serializable transactions, JSONB fraud signals,
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Node.js 20+](https://nodejs.org/)
 
-### 1. Clone and scaffold
+### 1. Clone
 
 ```bash
-git clone https://github.com/you/SmartLedger.git
+git clone https://github.com/aykutkaann/SmartLedger.git
 cd SmartLedger
-chmod +x setup.sh && ./setup.sh
 ```
 
 ### 2. Start infrastructure
 
 ```bash
-docker compose up postgres redis jaeger -d
+docker compose up postgres -d
 ```
 
 ### 3. Run the API
@@ -77,9 +75,7 @@ docker compose up --build
 | Service       | URL                         |
 |---------------|-----------------------------|
 | API           | http://localhost:5000        |
-| Swagger UI    | http://localhost:5000/swagger|
 | Frontend      | http://localhost:5173        |
-| Jaeger UI     | http://localhost:16686       |
 | PostgreSQL    | localhost:5432               |
 
 ---
@@ -156,6 +152,16 @@ SmartLedger/
 ├── Dockerfile.worker
 └── .github/workflows/ci.yml
 ```
+
+---
+
+## Authorship & AI assistance
+
+The entire **backend** — domain model, CQRS handlers, EF Core + Dapper persistence, JWT auth with refresh token rotation, fraud scoring worker, RLS policy, OpenTelemetry integration, integration tests, and Docker setup — was **designed and written by me**.
+
+The **React/TypeScript frontend** (`/frontend`) was generated with the assistance of **GitHub Copilot (Claude Sonnet)**. I provided the requirements, reviewed the output, and integrated it with the API — but I did not write the frontend code by hand.
+
+This distinction is intentional and transparent. Using AI tooling to scaffold a UI while focusing engineering effort on backend architecture is a deliberate and common real-world workflow.
 
 ---
 
