@@ -2,3 +2,8 @@
 [Bb]in/
 [Oo]bj/
 *.user
+
+# Local dev secrets — never commit real credentials
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
