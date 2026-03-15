@@ -1,0 +1,29 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# Frontend deps & build output
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vs/
+*.user
+**/.idea/
+
+# Test results
+**/TestResults/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Misc
+**/*.md
+**/.*

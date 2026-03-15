@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  # Postgres
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartledger_postgres
+    environment:
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB:       smartledger_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+
+
+
+
+# API 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: smartledger_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=smartledger_dev;Username=postgres;Password=admin"
+      Jwt__Key:           "CHANGE_THIS_TO_A_32_CHARACTER_SECRET_KEY_MIN"
+      Jwt__Issuer:        SmartLedger
+      Jwt__ExpiryMinutes: "15"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      
+
+
+# Worker
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: smartledger_worker
+    environment:
+        ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=smartledger_dev;Username=postgres;Password=admin"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+# React frontend (dev server)
+  frontend:
+    image: node:20-alpine
+    container_name: smartledger_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_nm:/app/node_modules
+    environment:
+      VITE_API_TARGET: "http://api:5000"
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+ 
+volumes:
+  postgres_data:
+  frontend_nm:

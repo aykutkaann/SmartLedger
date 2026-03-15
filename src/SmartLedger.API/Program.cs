@@ -95,7 +95,10 @@ builder.Services.AddSwaggerGen(c =>
 // ── CORS (for React dev server) ───────────────────────────────────────────────
 builder.Services.AddCors(opt =>
     opt.AddPolicy("ReactDev", p => p
-        .WithOrigins("http://localhost:5173")
+        .WithOrigins(
+            "http://localhost:5173",  // Vite dev server
+            "http://localhost:4173"   // Vite preview
+        )
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()));
